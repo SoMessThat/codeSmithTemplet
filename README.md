@@ -1,0 +1,2 @@
+# codeSmithTemplet
+codeSmith数据库表格基本增删改查接口模板
