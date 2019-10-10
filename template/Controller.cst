@@ -1,0 +1,59 @@
+﻿<%@ CodeTemplate Src="common.cs"  Inherits="Common.CommonSqlCode" Language="C#" 
+TargetLanguage="Java" Description="NetTiers main template." Debug="True" ResponseEncoding="UTF-8"%>
+<%@ Assembly Name="System.Data" %>
+<%@ Import Namespace="System.Data" %>
+<%@ Assembly Name="SchemaExplorer" %>
+<%@ Import Namespace="SchemaExplorer" %>
+<%@ Import Namespace="Common" %>
+
+<%@ Property Name="package" Type="String" Category="2.项目"  Default=""   Description="包名，输入com.cse.sherp" %>		
+<%@ Property Name="author" Type="String" Category="1.版权信息"   Description="作者"  Optional="True" Default="wu.kaibin" %>
+<%@ Property Name="SrcTable" Type="SchemaExplorer.TableSchema" Category="3.当前要做的表"  Description="当前要做的表" %>
+package <%=package%>.api;
+
+import java.util.List;
+
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.RestController;
+
+import <%=package%>.api.<%=getTableJavaFirstUpperName(SrcTable.Name)%>Api;
+import <%=package%>.service.<%=getTableJavaFirstUpperName(SrcTable.Name)%>Service;
+import com.cetccity.common.base.util.BeanUtil;
+import <%=package%>.vo.<%=getTableJavaFirstUpperName(SrcTable.Name)%>Vo;
+import com.cetccity.common.base.vo.PageVo;
+
+@RestController
+public class <%=getTableJavaFirstUpperName(SrcTable.Name)%>Controller implements <%=getTableJavaFirstUpperName(SrcTable.Name)%>Api {
+	
+	@Autowired
+	<%=getTableJavaFirstUpperName(SrcTable.Name)%>Service <%=getTableJavaFirstLowerName(SrcTable.Name)%>Service;
+	
+	@Override
+	public PageVo<<%=getTableJavaFirstUpperName(SrcTable.Name)%>Vo> query<%=getTableJavaFirstUpperName(SrcTable.Name)%>(<%=getTableJavaFirstUpperName(SrcTable.Name)%>Vo vo){
+		List<<%=getTableJavaFirstUpperName(SrcTable.Name)%>Vo> list = <%=getTableJavaFirstLowerName(SrcTable.Name)%>Service.query<%=getTableJavaFirstUpperName(SrcTable.Name)%>(vo);
+		return BeanUtil.page(list);	
+	}
+
+	@Override
+	public int add<%=getTableJavaFirstUpperName(SrcTable.Name)%>(@RequestBody <%=getTableJavaFirstUpperName(SrcTable.Name)%>Vo vo){
+		return <%=getTableJavaFirstLowerName(SrcTable.Name)%>Service.add<%=getTableJavaFirstUpperName(SrcTable.Name)%>(vo);
+	}
+	
+	@Override
+	public <%=getTableJavaFirstUpperName(SrcTable.Name)%>Vo find<%=getTableJavaFirstUpperName(SrcTable.Name)%>ById(@RequestParam("id") Long id){
+		return <%=getTableJavaFirstLowerName(SrcTable.Name)%>Service.find<%=getTableJavaFirstUpperName(SrcTable.Name)%>ById(id);
+	}
+	
+	@Override
+	public int update<%=getTableJavaFirstUpperName(SrcTable.Name)%>ById(@RequestBody <%=getTableJavaFirstUpperName(SrcTable.Name)%>Vo vo){
+		return <%=getTableJavaFirstLowerName(SrcTable.Name)%>Service.update<%=getTableJavaFirstUpperName(SrcTable.Name)%>ById(vo);
+	}
+	
+	@Override
+	public int del<%=getTableJavaFirstUpperName(SrcTable.Name)%>ById(@RequestParam("id") Long id){
+		return <%=getTableJavaFirstLowerName(SrcTable.Name)%>Service.del<%=getTableJavaFirstUpperName(SrcTable.Name)%>ById(id);
+	}
+	
+}

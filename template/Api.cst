@@ -1,0 +1,64 @@
+﻿<%@ CodeTemplate Src="common.cs"  Inherits="Common.CommonSqlCode" Language="C#" 
+TargetLanguage="Java" Description="NetTiers main template." Debug="True" ResponseEncoding="UTF-8"%>
+<%@ Assembly Name="System.Data" %>
+<%@ Import Namespace="System.Data" %>
+<%@ Assembly Name="SchemaExplorer" %>
+<%@ Import Namespace="SchemaExplorer" %>
+<%@ Import Namespace="Common" %>
+
+<%@ Property Name="package" Type="String" Category="2.项目"  Default=""   Description="包名，输入com.cse.sherp" %>		
+<%@ Property Name="author" Type="String" Category="1.版权信息"   Description="作者"  Optional="True" Default="wu.kaibin" %>
+<%@ Property Name="SrcTable" Type="SchemaExplorer.TableSchema" Category="3.当前要做的表"  Description="当前要做的表" %>
+package <%=package%>.api;
+
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
+
+import <%=package%>.vo.<%=getTableJavaFirstUpperName(SrcTable.Name)%>Vo;
+import com.cetccity.common.base.vo.PageVo;
+
+@RequestMapping("/<%=getTableJavaFirstLowerName(SrcTable.Name)%>")
+public interface <%=getTableJavaFirstUpperName(SrcTable.Name)%>Api {
+	
+	/**
+	 * 查找所有XXXXX
+	 * @createTime: <%= DateTime.Now.ToLocalTime().ToString() %>
+	 * @author: <%=author%>
+	 */
+	@RequestMapping("/query<%=getTableJavaFirstUpperName(SrcTable.Name)%>")
+	PageVo<<%=getTableJavaFirstUpperName(SrcTable.Name)%>Vo> query<%=getTableJavaFirstUpperName(SrcTable.Name)%>(<%=getTableJavaFirstUpperName(SrcTable.Name)%>Vo vo);
+
+	/**
+	 * 新增XXXXX
+	 * @createTime: <%= DateTime.Now.ToLocalTime().ToString() %>
+	 * @author: <%=author%>
+	 */
+	@RequestMapping("/add<%=getTableJavaFirstUpperName(SrcTable.Name)%>")
+	int add<%=getTableJavaFirstUpperName(SrcTable.Name)%>(@RequestBody <%=getTableJavaFirstUpperName(SrcTable.Name)%>Vo vo);
+	
+	/**
+	 * 通过id查看XXXXX信息
+	 * @createTime: <%= DateTime.Now.ToLocalTime().ToString() %>
+	 * @author: <%=author%>
+	 */
+	@RequestMapping("/find<%=getTableJavaFirstUpperName(SrcTable.Name)%>ById")
+	<%=getTableJavaFirstUpperName(SrcTable.Name)%>Vo find<%=getTableJavaFirstUpperName(SrcTable.Name)%>ById(@RequestParam("id") Long id);
+	
+	/**
+	 * 通过id修改XXXXX
+	 * @createTime: <%= DateTime.Now.ToLocalTime().ToString() %>
+	 * @author: <%=author%>
+	 */
+	@RequestMapping("/update<%=getTableJavaFirstUpperName(SrcTable.Name)%>ById")
+	int update<%=getTableJavaFirstUpperName(SrcTable.Name)%>ById(@RequestBody <%=getTableJavaFirstUpperName(SrcTable.Name)%>Vo vo);
+	
+	/**
+	 * 通过id软删除XXXXX信息
+	 * @createTime: <%= DateTime.Now.ToLocalTime().ToString() %>
+	 * @author: <%=author%>
+	 */
+	@RequestMapping("/del<%=getTableJavaFirstUpperName(SrcTable.Name)%>ById")
+	int del<%=getTableJavaFirstUpperName(SrcTable.Name)%>ById(@RequestParam("id") Long id);
+	
+}

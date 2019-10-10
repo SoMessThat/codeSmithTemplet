@@ -1,0 +1,24 @@
+﻿<%@ CodeTemplate Src="common.cs"  Inherits="Common.CommonSqlCode" Language="C#" 
+TargetLanguage="Java" Description="NetTiers main template." Debug="True" ResponseEncoding="UTF-8"%>
+<%@ Assembly Name="System.Data" %>
+<%@ Import Namespace="System.Data" %>
+<%@ Assembly Name="SchemaExplorer" %>
+<%@ Import Namespace="SchemaExplorer" %>
+<%@ Import Namespace="Common" %>
+
+<%@ Property Name="package" Type="String" Category="2.项目"  Default=""   Description="包名，输入com.cse.sherp" %>		
+<%@ Property Name="SrcTable" Type="SchemaExplorer.TableSchema" Category="3.当前要做的表"  Description="当前要做的表" %>
+
+	List<<%=getTableJavaFirstUpperName(SrcTable.Name)%>Vo> query<%=getTableJavaFirstUpperName(SrcTable.Name)%>(<%=getTableJavaFirstUpperName(SrcTable.Name)%>Vo vo);
+	
+	
+	<select id="query<%=getTableJavaFirstUpperName(SrcTable.Name)%>" resultType="<%=package%>.vo.<%=getTableJavaFirstUpperName(SrcTable.Name)%>Vo">
+    select * from <%=SrcTable%> aa
+    <where>
+	<%foreach(ColumnSchema t1 in SrcTable.Columns){%>  
+	  <if test="<%=getPropertiesName(t1.Name)%> != null">
+		and aa.<%=t1.Name%> = #{<%=getPropertiesName(t1.Name)%>}
+      </if>
+	<%}%>
+    </where>
+  </select>
