@@ -1,0 +1,226 @@
+﻿<%@ CodeTemplate Src="common.cs"  Inherits="Common.CommonSqlCode" Language="C#" 
+TargetLanguage="Java" Description="NetTiers main template." Debug="True" ResponseEncoding="UTF-8"%>
+<%@ Assembly Name="System.Data" %>
+<%@ Import Namespace="System.Data" %>
+<%@ Assembly Name="SchemaExplorer" %>
+<%@ Import Namespace="SchemaExplorer" %>
+<%@ Import Namespace="Common" %>
+<%@ Property Name="SrcTable" Type="SchemaExplorer.TableSchema" Category="3.当前要做的表"  Description="当前要做的表" %>
+<template>
+	<div id="app">
+		<%foreach(ColumnSchema t1 in SrcTable.Columns){%>
+		<el-input v-model="<%=getPropertiesName(t1.Name)%>" placeholder="<%=t1.Description %>" style="width:200px"></el-input>
+		<%}%>
+		<el-button type="primary" icon="el-icon-search" @click="onSearch">搜索</el-button>
+		<el-button type="primary" icon="el-icon-add" @click="add<%=getTableJavaFirstUpperName(SrcTable.Name)%>">新建</el-button>
+		<el-table :data="<%=getTableJavaFirstLowerName(SrcTable.Name)%>s"> 
+			<%foreach(ColumnSchema t1 in SrcTable.Columns){%>
+			<el-table-column prop="<%=getPropertiesName(t1.Name)%>" label="<%=t1.Description %>"></el-table-column> 			
+			<%}%>
+			<el-table-column prop="status" label="状态" :formatter="formatStatus"></el-table-column>
+			<el-table-column fixed="right" label="操作" width="150"> 
+			<template slot-scope="scope">   
+				<el-button @click="modify<%=getTableJavaFirstUpperName(SrcTable.Name)%>(scope.row)" type="text" size="small">修改</el-button>
+				<el-button @click="del<%=getTableJavaFirstUpperName(SrcTable.Name)%>(scope.row.id)" type="text" size="small">删除</el-button>
+			</template>
+			</el-table-column>   
+		</el-table>
+		
+		<el-dialog title="表单弹框" :visible.sync="dialogFormVisible" center>
+			<el-form ref="form" :model="<%=getTableJavaFirstLowerName(SrcTable.Name)%>" label-width="80px">
+				<%foreach(ColumnSchema t1 in SrcTable.Columns){%>
+				<el-form-item label="<%=t1.Description %>">
+					<el-input v-model="<%=getTableJavaFirstLowerName(SrcTable.Name)%>.<%=getPropertiesName(t1.Name)%>"></el-input>
+				</el-form-item> 			
+				<%}%>
+				<el-form-item label="状态" prop="status">
+					<el-select v-model="role.status" placeholder="状态">
+						<el-option label="启用" value="ENABLED"></el-option>
+						<el-option label="冻结" value="UNENABLED"></el-option>
+					</el-select>
+				</el-form-item>	
+			</el-form>
+			<span slot="footer" class="dialog-footer">
+				<el-button @click="dialogFormVisible = false">取 消</el-button>
+				<el-button @click="onSibmit">确 定</el-button>
+			</span>
+		</el-dialog>
+	</div>
+</template>
+
+<script>
+import GLOBAL from '@/components/global_val.js'
+
+export default {
+  name: '*********',
+  data() {
+    return {
+      name: '',
+		//<--搜索字段 ->
+	<%foreach(ColumnSchema t1 in SrcTable.Columns){%>
+	<%=getPropertiesName(t1.Name)%>: "",
+	<%}%>
+      id: null,
+      visible: true,
+      isAdd: true,
+      dialogFormVisible: false,
+      <%=getTableJavaFirstLowerName(SrcTable.Name)%>s: [{
+		//<-- 字段类型 ->
+		<%foreach(ColumnSchema t1 in SrcTable.Columns){%>
+		<%=getPropertiesName(t1.Name)%>: "",
+		<%}%>
+      }],
+      <%=getTableJavaFirstLowerName(SrcTable.Name)%>: {
+        <%foreach(ColumnSchema t1 in SrcTable.Columns){%>
+		<%=getPropertiesName(t1.Name)%>: "",
+		<%}%>
+      }
+    }
+  },
+  mounted(){
+    this.intiTable();
+  },
+  methods: {
+	formatStatus: function(row, column) {
+      return row.status === 'ENABLED' ? "正常" : "冻结";
+    },
+    intiTable() {
+      this.$axios({
+        method: "post",
+        url: GLOBAL.api+"/<%=getTableJavaFirstLowerName(SrcTable.Name)%>/query<%=getTableJavaFirstUpperName(SrcTable.Name)%>",
+      }).then((res) => {
+        this.<%=getTableJavaFirstLowerName(SrcTable.Name)%>s = res.data.data;
+      }).catch((res) => {
+        console.log(res);
+        this.$message.error('查询失败');
+      });
+    },
+    onSearch() {
+      this.$axios({
+        method: "post",
+        url: GLOBAL.api+"/<%=getTableJavaFirstLowerName(SrcTable.Name)%>/query<%=getTableJavaFirstUpperName(SrcTable.Name)%>",
+        data:{
+          //<--搜索字段 ->
+          <%foreach(ColumnSchema t1 in SrcTable.Columns){%>
+		  <%=getPropertiesName(t1.Name)%>: this.<%=getPropertiesName(t1.Name)%>,
+		  <%}%>
+        }
+      }).then((res) => {
+        this.<%=getTableJavaFirstLowerName(SrcTable.Name)%>s = res.data.data;
+      }).catch((res) => {
+        console.log(res);
+        this.$message.error('查询失败');
+      });
+    },
+    add<%=getTableJavaFirstUpperName(SrcTable.Name)%>() {
+      this.dialogFormVisible = true;
+      this.isAdd = true;
+    },
+    modify<%=getTableJavaFirstUpperName(SrcTable.Name)%>(row) {
+      this.dialogFormVisible = true;
+      this.<%=getTableJavaFirstLowerName(SrcTable.Name)%> = row;
+      this.id = row.id;
+      this.isAdd = false;
+    },
+    del<%=getTableJavaFirstUpperName(SrcTable.Name)%>(id) {
+      this.$axios({
+        method: "get",
+        url: GLOBAL.api+"/<%=getTableJavaFirstLowerName(SrcTable.Name)%>/del<%=getTableJavaFirstUpperName(SrcTable.Name)%>ById",
+        params: {
+          id: id
+        }
+      }).then((res) => {
+        if(res.data > 0){
+          this.$message({
+            message: '删除成功',
+            type: 'success'
+          });
+          this.intiTable();
+        }else{
+          this.$message.error('删除失败');
+        }
+      }).catch((res) => {
+        console.log(res);
+        this.$message.error('删除失败');
+      });
+    },
+    onSibmit() {
+      if(this.isAdd) {
+        this.onAdd();
+      }else {
+        this.onModify();
+      }
+    },
+    onAdd() {
+      this.$axios({
+        method: "post",
+        url: GLOBAL.api+"/<%=getTableJavaFirstLowerName(SrcTable.Name)%>/add<%=getTableJavaFirstUpperName(SrcTable.Name)%>",
+        data:{
+          //<--表单字段，需删除id ->
+          <%foreach(ColumnSchema t1 in SrcTable.Columns){%>
+		  <%=getPropertiesName(t1.Name)%>: this.<%=getTableJavaFirstLowerName(SrcTable.Name)%>.<%=getPropertiesName(t1.Name)%>,
+		  <%}%>
+        }
+      }).then((res) => {
+        if(res.data > 0){
+          this.$message({
+            message: '新增成功',
+            type: 'success'
+          });
+          this.dialogFormVisible = false;
+          this.intiTable();
+        }else{
+          this.$message.error('新增失败');
+        }
+      }).catch((res) => {
+        console.log(res);
+        this.$message.error('新增失败');
+      });
+    },
+    onModify() {
+      this.$axios({
+        method: "post",
+        url: GLOBAL.api+"/<%=getTableJavaFirstLowerName(SrcTable.Name)%>/update<%=getTableJavaFirstUpperName(SrcTable.Name)%>ById",
+        data:{
+          //<--表单字段 ->
+          <%foreach(ColumnSchema t1 in SrcTable.Columns){%>
+		  <%=getPropertiesName(t1.Name)%>: this.<%=getTableJavaFirstLowerName(SrcTable.Name)%>.<%=getPropertiesName(t1.Name)%>,
+		  <%}%>
+        }
+      }).then((res) => {
+        if(res.data > 0){
+          this.$message({
+            message: '修改成功',
+            type: 'success'
+          });
+          this.dialogFormVisible = false;
+          this.intiTable();
+        }else{
+          this.$message.error('修改失败');
+        }
+      }).catch((res) => {
+        console.log(res);
+        this.$message.error('修改失败');
+      });
+    }
+  }
+};
+</script>
+
+<!-- Add "scoped" attribute to limit CSS to this component only -->
+<style scoped>
+h1, h2 {
+  font-weight: normal;
+}
+ul {
+  list-style-type: none;
+  padding: 0;
+}
+li {
+  display: inline-block;
+  margin: 0 10px;
+}
+a {
+  color: #42b983;
+}
+</style>
